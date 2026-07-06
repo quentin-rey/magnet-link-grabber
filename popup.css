@@ -151,15 +151,21 @@ a.theme-toggle {
   height: 15px;
 }
 
-.theme-toggle #moonIcon {
+.theme-toggle #sunIcon,
+.theme-toggle #moonIcon,
+.theme-toggle #systemIcon {
   display: none;
 }
 
-:root[data-theme="dark"] .theme-toggle #sunIcon {
-  display: none;
+:root[data-theme-mode="system"] .theme-toggle #systemIcon {
+  display: block;
 }
 
-:root[data-theme="dark"] .theme-toggle #moonIcon {
+:root[data-theme-mode="light"] .theme-toggle #sunIcon {
+  display: block;
+}
+
+:root[data-theme-mode="dark"] .theme-toggle #moonIcon {
   display: block;
 }
 

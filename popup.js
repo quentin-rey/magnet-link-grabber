@@ -12,24 +12,36 @@ let allLinks = []; // [{ url, name }]
 const selected = new Set();
 
 const THEME_KEY = "theme";
+const THEME_MODES = ["system", "light", "dark"];
+const darkMediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
+
+let themeMode = "system";
 
 function systemTheme() {
-  return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+  return darkMediaQuery.matches ? "dark" : "light";
 }
 
-function applyTheme(theme) {
-  document.documentElement.setAttribute("data-theme", theme);
+const THEME_LABELS = { system: "système", light: "clair", dark: "sombre" };
+
+function applyThemeMode(mode) {
+  themeMode = mode;
+  document.documentElement.setAttribute("data-theme-mode", mode);
+  document.documentElement.setAttribute("data-theme", mode === "system" ? systemTheme() : mode);
+  themeToggleBtn.title = `Thème : ${THEME_LABELS[mode]}`;
 }
 
 async function initTheme() {
   const stored = await chrome.storage.local.get(THEME_KEY);
-  applyTheme(stored[THEME_KEY] || systemTheme());
+  applyThemeMode(stored[THEME_KEY] || "system");
 }
 
+darkMediaQuery.addEventListener("change", () => {
+  if (themeMode === "system") applyThemeMode("system");
+});
+
 themeToggleBtn.addEventListener("click", async () => {
-  const current = document.documentElement.getAttribute("data-theme");
-  const next = current === "dark" ? "light" : "dark";
-  applyTheme(next);
+  const next = THEME_MODES[(THEME_MODES.indexOf(themeMode) + 1) % THEME_MODES.length];
+  applyThemeMode(next);
   await chrome.storage.local.set({ [THEME_KEY]: next });
 });
 
