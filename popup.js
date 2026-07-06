@@ -133,6 +133,9 @@ function applyFilter() {
     if (match) visibleCount += 1;
   });
 
+  countEl.textContent =
+    words.length > 0 ? `${visibleCount}/${allLinks.length}` : String(allLinks.length);
+
   const existingEmpty = listEl.querySelector(".empty-state");
   if (words.length > 0 && visibleCount === 0) {
     if (!existingEmpty) {
