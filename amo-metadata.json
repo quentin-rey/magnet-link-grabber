@@ -1,0 +1,11 @@
+{
+  "version": {
+    "license": "MIT"
+  },
+  "categories": {
+    "firefox": ["download-management"]
+  },
+  "summary": {
+    "en-US": "Finds every magnet link on the current page and lists them in a clean popup. Search, select, and copy one, several, or all links to your clipboard in one click. Light, dark, and system themes included."
+  }
+}
