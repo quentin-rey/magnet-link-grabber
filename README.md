@@ -1,8 +1,8 @@
 # Magnet Link Grabber
 
-Chrome extension that grabs every magnet link (`magnet:?xt...`) found on a web page, so you can copy them easily.
+Browser extension (Chrome and Firefox) that grabs every magnet link (`magnet:?xt...`) found on a web page, so you can copy them easily.
 
-> ⚠️ **Not yet published on the Chrome Web Store.** For now the extension can only be installed manually in developer mode — see [Installation](#installation-developer-mode) below.
+> ⚠️ **Not yet published on the Chrome Web Store.** For now the Chrome extension can only be installed manually in developer mode — see [Installation](#installation) below.
 
 <p align="center">
   <img src="screenshots/popup-light.png" alt="Popup in light mode" width="360" />
@@ -21,7 +21,7 @@ Chrome extension that grabs every magnet link (`magnet:?xt...`) found on a web p
 
 ### Search
 
-Type a few words to filter the list — matching is order-independent, so `movie 1080p` finds `Some Great Movie 2024 1080p BluRay x264`.
+Type a few words to filter the list — matching is order-independent, so `open bunny` finds `Blender Open Movie - Big Buck Bunny`.
 
 <p align="center">
   <img src="screenshots/popup-search.png" alt="Filtering links with the search box" width="360" />
@@ -35,12 +35,19 @@ Check the boxes you need (or "Select all") and hit "Copy selection" to copy only
   <img src="screenshots/popup-selection.png" alt="Selecting specific links to copy" width="360" />
 </p>
 
-## Installation (developer mode)
+## Installation
+
+### Chrome (developer mode)
 
 1. Open `chrome://extensions`
 2. Enable "Developer mode" (top right)
 3. Click "Load unpacked"
 4. Select this project's folder
+
+### Firefox
+
+- **Permanent install:** download the signed `.xpi` from the [Releases](../../releases) page and drag it into a Firefox window (or `about:addons` → gear icon → "Install Add-on From File").
+- **Temporary / dev mode:** open `about:debugging#/runtime/this-firefox` → "Load Temporary Add-on" → select `manifest.json` in this project's folder. Resets on every Firefox restart.
 
 ## Usage
 
