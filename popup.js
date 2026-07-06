@@ -21,13 +21,13 @@ function systemTheme() {
   return darkMediaQuery.matches ? "dark" : "light";
 }
 
-const THEME_LABELS = { system: "système", light: "clair", dark: "sombre" };
+const THEME_LABELS = { system: "system", light: "light", dark: "dark" };
 
 function applyThemeMode(mode) {
   themeMode = mode;
   document.documentElement.setAttribute("data-theme-mode", mode);
   document.documentElement.setAttribute("data-theme", mode === "system" ? systemTheme() : mode);
-  themeToggleBtn.title = `Thème : ${THEME_LABELS[mode]}`;
+  themeToggleBtn.title = `Theme: ${THEME_LABELS[mode]}`;
 }
 
 async function initTheme() {
@@ -76,7 +76,7 @@ async function copyText(text, btn, activeLabel) {
   await navigator.clipboard.writeText(text);
   if (!btn) return;
   const original = btn.textContent;
-  btn.textContent = activeLabel || "Copié !";
+  btn.textContent = activeLabel || "Copied!";
   btn.classList.add("copied");
   setTimeout(() => {
     btn.textContent = original;
@@ -115,8 +115,7 @@ function updateSelectAllState() {
       visibleSelectedCount > 0 && visibleSelectedCount < visible.length;
   }
 
-  selectAllLabel.textContent =
-    selected.size > 0 ? `${selected.size} sélectionné(s)` : "Tout sélectionner";
+  selectAllLabel.textContent = selected.size > 0 ? `${selected.size} selected` : "Select all";
 
   copySelectedBtn.disabled = selected.size === 0;
 }
@@ -141,7 +140,7 @@ function applyFilter() {
       li.className = "empty-state-item";
       const div = document.createElement("div");
       div.className = "empty-state";
-      div.textContent = "Aucun résultat pour cette recherche.";
+      div.textContent = "No results for this search.";
       li.appendChild(div);
       listEl.appendChild(li);
     }
@@ -158,7 +157,7 @@ function renderLinks(links) {
   listEl.innerHTML = "";
 
   if (allLinks.length === 0) {
-    statusEl.textContent = "Aucun lien magnet trouvé sur cette page.";
+    statusEl.textContent = "No magnet links found on this page.";
     countEl.textContent = "0";
     copyAllBtn.disabled = true;
     copySelectedBtn.disabled = true;
@@ -167,7 +166,7 @@ function renderLinks(links) {
     return;
   }
 
-  statusEl.textContent = `${allLinks.length} lien(s) magnet trouvé(s).`;
+  statusEl.textContent = `${allLinks.length} magnet link(s) found.`;
   countEl.textContent = String(allLinks.length);
   copyAllBtn.disabled = false;
   searchInput.disabled = false;
@@ -207,7 +206,7 @@ function renderLinks(links) {
 
     const copyBtn = document.createElement("button");
     copyBtn.className = "copy-one-btn";
-    copyBtn.textContent = "Copier";
+    copyBtn.textContent = "Copy";
     copyBtn.addEventListener("click", (e) => {
       e.stopPropagation();
       copyText(url, copyBtn);
@@ -239,19 +238,19 @@ selectAllCheckbox.addEventListener("change", () => {
 });
 
 copyAllBtn.addEventListener("click", () => {
-  copyText(allLinks.map((l) => l.url).join("\n"), copyAllBtn, "Copié !");
+  copyText(allLinks.map((l) => l.url).join("\n"), copyAllBtn, "Copied!");
 });
 
 copySelectedBtn.addEventListener("click", () => {
   const urls = allLinks.filter((l) => selected.has(l.url)).map((l) => l.url);
-  copyText(urls.join("\n"), copySelectedBtn, "Copié !");
+  copyText(urls.join("\n"), copySelectedBtn, "Copied!");
 });
 
 async function init() {
   const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
 
   if (!tab || !tab.id || !/^https?:/.test(tab.url || "")) {
-    statusEl.textContent = "Cette page n'est pas accessible.";
+    statusEl.textContent = "This page cannot be accessed.";
     return;
   }
 
@@ -262,7 +261,7 @@ async function init() {
     });
     renderLinks(links || []);
   } catch (err) {
-    statusEl.textContent = "Impossible d'analyser cette page.";
+    statusEl.textContent = "Unable to scan this page.";
   }
 }
 

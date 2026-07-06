@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "Magnet Link Grabber",
   "version": "1.1.0",
-  "description": "Récupère tous les liens magnet d'une page web pour les copier facilement.",
+  "description": "Grab all magnet links from a web page so you can copy them easily.",
   "permissions": ["activeTab", "scripting", "clipboardWrite", "storage"],
   "action": {
     "default_popup": "popup.html",
