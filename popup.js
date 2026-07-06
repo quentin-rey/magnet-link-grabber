@@ -1,6 +1,14 @@
 const statusEl = document.getElementById("status");
 const listEl = document.getElementById("linkList");
+const countEl = document.getElementById("count");
+const searchInput = document.getElementById("searchInput");
+const selectAllCheckbox = document.getElementById("selectAllCheckbox");
+const selectAllLabel = document.getElementById("selectAllLabel");
 const copyAllBtn = document.getElementById("copyAllBtn");
+const copySelectedBtn = document.getElementById("copySelectedBtn");
+
+let allLinks = []; // [{ url, name }]
+const selected = new Set();
 
 function extractMagnetLinks() {
   const anchors = Array.from(document.querySelectorAll('a[href^="magnet:?xt"]'));
@@ -27,52 +35,176 @@ function displayName(magnetUrl) {
   return magnetUrl;
 }
 
+async function copyText(text, btn, activeLabel) {
+  await navigator.clipboard.writeText(text);
+  if (!btn) return;
+  const original = btn.textContent;
+  btn.textContent = activeLabel || "Copié !";
+  btn.classList.add("copied");
+  setTimeout(() => {
+    btn.textContent = original;
+    btn.classList.remove("copied");
+  }, 1200);
+}
+
+function currentFilter() {
+  return searchInput.value.trim().toLowerCase();
+}
+
+function visibleLinks() {
+  const filter = currentFilter();
+  if (!filter) return allLinks;
+  return allLinks.filter(
+    (l) => l.name.toLowerCase().includes(filter) || l.url.toLowerCase().includes(filter)
+  );
+}
+
+function updateSelectAllState() {
+  const visible = visibleLinks();
+  const visibleSelectedCount = visible.filter((l) => selected.has(l.url)).length;
+
+  if (visible.length === 0) {
+    selectAllCheckbox.checked = false;
+    selectAllCheckbox.indeterminate = false;
+    selectAllCheckbox.disabled = true;
+  } else {
+    selectAllCheckbox.disabled = false;
+    selectAllCheckbox.checked = visibleSelectedCount === visible.length;
+    selectAllCheckbox.indeterminate =
+      visibleSelectedCount > 0 && visibleSelectedCount < visible.length;
+  }
+
+  selectAllLabel.textContent =
+    selected.size > 0 ? `${selected.size} sélectionné(s)` : "Tout sélectionner";
+
+  copySelectedBtn.disabled = selected.size === 0;
+}
+
+function applyFilter() {
+  const filter = currentFilter();
+  const items = listEl.querySelectorAll("li[data-url]");
+  let visibleCount = 0;
+
+  items.forEach((li) => {
+    const name = li.dataset.name;
+    const url = li.dataset.url;
+    const match = !filter || name.includes(filter) || url.includes(filter);
+    li.classList.toggle("hidden", !match);
+    if (match) visibleCount += 1;
+  });
+
+  const existingEmpty = listEl.querySelector(".empty-state");
+  if (filter && visibleCount === 0) {
+    if (!existingEmpty) {
+      const li = document.createElement("li");
+      li.className = "empty-state-item";
+      const div = document.createElement("div");
+      div.className = "empty-state";
+      div.textContent = "Aucun résultat pour cette recherche.";
+      li.appendChild(div);
+      listEl.appendChild(li);
+    }
+  } else if (existingEmpty) {
+    existingEmpty.closest("li")?.remove();
+  }
+
+  updateSelectAllState();
+}
+
 function renderLinks(links) {
+  allLinks = links.map((url) => ({ url, name: displayName(url) }));
+  selected.clear();
   listEl.innerHTML = "";
 
-  if (links.length === 0) {
+  if (allLinks.length === 0) {
     statusEl.textContent = "Aucun lien magnet trouvé sur cette page.";
+    countEl.textContent = "0";
     copyAllBtn.disabled = true;
+    copySelectedBtn.disabled = true;
+    selectAllCheckbox.disabled = true;
+    searchInput.disabled = true;
     return;
   }
 
-  statusEl.textContent = `${links.length} lien(s) magnet trouvé(s).`;
+  statusEl.textContent = `${allLinks.length} lien(s) magnet trouvé(s).`;
+  countEl.textContent = String(allLinks.length);
   copyAllBtn.disabled = false;
+  searchInput.disabled = false;
 
-  for (const link of links) {
+  for (const { url, name } of allLinks) {
     const li = document.createElement("li");
+    li.dataset.url = url.toLowerCase();
+    li.dataset.name = name.toLowerCase();
+
+    const checkbox = document.createElement("input");
+    checkbox.type = "checkbox";
+    checkbox.addEventListener("change", () => {
+      if (checkbox.checked) selected.add(url);
+      else selected.delete(url);
+      updateSelectAllState();
+    });
+
+    const info = document.createElement("div");
+    info.className = "magnet-info";
+    info.addEventListener("click", () => {
+      checkbox.checked = !checkbox.checked;
+      checkbox.dispatchEvent(new Event("change"));
+    });
 
     const label = document.createElement("span");
     label.className = "magnet-label";
-    label.textContent = displayName(link);
-    label.title = link;
+    label.textContent = name;
+    label.title = name;
+
+    const urlLine = document.createElement("span");
+    urlLine.className = "magnet-url";
+    urlLine.textContent = url;
+    urlLine.title = url;
+
+    info.appendChild(label);
+    info.appendChild(urlLine);
 
     const copyBtn = document.createElement("button");
     copyBtn.className = "copy-one-btn";
     copyBtn.textContent = "Copier";
-    copyBtn.addEventListener("click", async () => {
-      await navigator.clipboard.writeText(link);
-      copyBtn.textContent = "Copié !";
-      copyBtn.classList.add("copied");
-      setTimeout(() => {
-        copyBtn.textContent = "Copier";
-        copyBtn.classList.remove("copied");
-      }, 1200);
+    copyBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      copyText(url, copyBtn);
     });
 
-    li.appendChild(label);
+    li.appendChild(checkbox);
+    li.appendChild(info);
     li.appendChild(copyBtn);
     listEl.appendChild(li);
   }
 
-  copyAllBtn.onclick = async () => {
-    await navigator.clipboard.writeText(links.join("\n"));
-    copyAllBtn.textContent = "Copié !";
-    setTimeout(() => {
-      copyAllBtn.textContent = "Copier tout";
-    }, 1200);
-  };
+  updateSelectAllState();
 }
+
+searchInput.addEventListener("input", applyFilter);
+
+selectAllCheckbox.addEventListener("change", () => {
+  const shouldSelect = selectAllCheckbox.checked;
+  const items = listEl.querySelectorAll("li[data-url]:not(.hidden)");
+  items.forEach((li) => {
+    const checkbox = li.querySelector('input[type="checkbox"]');
+    const url = allLinks.find((l) => l.url.toLowerCase() === li.dataset.url)?.url;
+    if (!checkbox || !url) return;
+    checkbox.checked = shouldSelect;
+    if (shouldSelect) selected.add(url);
+    else selected.delete(url);
+  });
+  updateSelectAllState();
+});
+
+copyAllBtn.addEventListener("click", () => {
+  copyText(allLinks.map((l) => l.url).join("\n"), copyAllBtn, "Copié !");
+});
+
+copySelectedBtn.addEventListener("click", () => {
+  const urls = allLinks.filter((l) => selected.has(l.url)).map((l) => l.url);
+  copyText(urls.join("\n"), copySelectedBtn, "Copié !");
+});
 
 async function init() {
   const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });

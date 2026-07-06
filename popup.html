@@ -7,11 +7,35 @@
 </head>
 <body>
   <header>
-    <h1>Liens magnet</h1>
-    <button id="copyAllBtn" disabled>Copier tout</button>
+    <div class="title">
+      <img src="icons/icon32.png" alt="" width="20" height="20" />
+      <h1>Liens magnet</h1>
+    </div>
+    <span id="count" class="count">0</span>
   </header>
 
-  <p id="status">Recherche des liens magnet...</p>
+  <div class="toolbar">
+    <div class="search-wrap">
+      <svg class="search-icon" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="9" cy="9" r="6.5" stroke="currentColor" stroke-width="1.6" />
+        <line x1="13.6" y1="13.6" x2="18" y2="18" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
+      </svg>
+      <input id="searchInput" type="text" placeholder="Rechercher un lien..." autocomplete="off" />
+    </div>
+  </div>
+
+  <div class="select-row">
+    <label class="checkbox-wrap">
+      <input type="checkbox" id="selectAllCheckbox" />
+      <span id="selectAllLabel">Tout sélectionner</span>
+    </label>
+    <div class="actions">
+      <button id="copySelectedBtn" class="btn btn-secondary" disabled>Copier la sélection</button>
+      <button id="copyAllBtn" class="btn btn-primary" disabled>Copier tout</button>
+    </div>
+  </div>
+
+  <p id="status" class="status">Recherche des liens magnet...</p>
 
   <ul id="linkList"></ul>
 

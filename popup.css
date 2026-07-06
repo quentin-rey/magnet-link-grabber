@@ -1,89 +1,326 @@
+:root {
+  --bg: #f7f8fa;
+  --surface: #ffffff;
+  --border: #e6e8ec;
+  --text: #16181d;
+  --text-muted: #6b7280;
+  --accent: #2563eb;
+  --accent-hover: #1d4ed8;
+  --accent-soft: #eaf1ff;
+  --success: #16a34a;
+  --success-hover: #15803d;
+  --danger: #dc2626;
+  --shadow: 0 1px 2px rgba(16, 24, 40, 0.04), 0 1px 3px rgba(16, 24, 40, 0.06);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #1c1e22;
+    --surface: #24272c;
+    --border: #34383f;
+    --text: #f0f1f3;
+    --text-muted: #9aa0aa;
+    --accent: #3b82f6;
+    --accent-hover: #60a5fa;
+    --accent-soft: #24314d;
+    --success: #22c55e;
+    --success-hover: #4ade80;
+    --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 2px 6px rgba(0, 0, 0, 0.25);
+  }
+}
+
+* {
+  box-sizing: border-box;
+}
+
 body {
-  width: 380px;
-  max-height: 500px;
+  width: 400px;
+  max-height: 560px;
   margin: 0;
-  padding: 12px;
+  padding: 14px;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   font-size: 13px;
-  color: #1a1a1a;
-  background: #fafafa;
+  color: var(--text);
+  background: var(--bg);
 }
 
 header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 8px;
+  margin-bottom: 10px;
+}
+
+.title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.title img {
+  border-radius: 6px;
 }
 
 h1 {
   font-size: 15px;
+  font-weight: 700;
   margin: 0;
+  letter-spacing: -0.01em;
 }
 
-button {
+.count {
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-weight: 700;
+  font-size: 12px;
+  padding: 2px 9px;
+  border-radius: 999px;
+  min-width: 20px;
+  text-align: center;
+}
+
+.toolbar {
+  margin-bottom: 8px;
+}
+
+.search-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.search-icon {
+  position: absolute;
+  left: 10px;
+  width: 15px;
+  height: 15px;
+  color: var(--text-muted);
+  pointer-events: none;
+}
+
+#searchInput {
+  width: 100%;
+  padding: 8px 10px 8px 32px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  font-size: 12.5px;
+  outline: none;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+#searchInput:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-soft);
+}
+
+#searchInput::placeholder {
+  color: var(--text-muted);
+}
+
+.select-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  gap: 8px;
+}
+
+.checkbox-wrap {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  color: var(--text-muted);
+  font-size: 12px;
+  user-select: none;
+  white-space: nowrap;
+}
+
+input[type="checkbox"] {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 15px;
+  height: 15px;
+  min-width: 15px;
+  border: 1.5px solid var(--border);
+  border-radius: 4px;
+  background: var(--surface);
+  cursor: pointer;
+  position: relative;
+  transition: background 0.12s ease, border-color 0.12s ease;
+}
+
+input[type="checkbox"]:checked {
+  background: var(--accent);
+  border-color: var(--accent);
+}
+
+input[type="checkbox"]:checked::after {
+  content: "";
+  position: absolute;
+  left: 4px;
+  top: 1px;
+  width: 4px;
+  height: 8px;
+  border: solid white;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+
+input[type="checkbox"]:indeterminate {
+  background: var(--accent);
+  border-color: var(--accent);
+}
+
+input[type="checkbox"]:indeterminate::after {
+  content: "";
+  position: absolute;
+  left: 3px;
+  top: 6px;
+  width: 7px;
+  height: 2px;
+  background: white;
+}
+
+.actions {
+  display: flex;
+  gap: 6px;
+}
+
+.btn {
   cursor: pointer;
   border: none;
-  border-radius: 6px;
-  padding: 6px 10px;
+  border-radius: 7px;
+  padding: 6px 11px;
   font-size: 12px;
   font-weight: 600;
-  background: #2563eb;
-  color: #fff;
+  transition: background 0.12s ease, transform 0.05s ease;
+  white-space: nowrap;
 }
 
-button:disabled {
-  background: #b7c4e0;
+.btn:active:not(:disabled) {
+  transform: scale(0.97);
+}
+
+.btn:disabled {
+  opacity: 0.45;
   cursor: not-allowed;
 }
 
-button:hover:not(:disabled) {
-  background: #1d4ed8;
+.btn-primary {
+  background: var(--accent);
+  color: #fff;
 }
 
-#status {
-  color: #555;
-  margin: 4px 0 8px;
+.btn-primary:hover:not(:disabled) {
+  background: var(--accent-hover);
+}
+
+.btn-secondary {
+  background: var(--surface);
+  color: var(--text);
+  border: 1px solid var(--border);
+}
+
+.btn-secondary:hover:not(:disabled) {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.status {
+  color: var(--text-muted);
+  margin: 2px 0 8px;
+  font-size: 12.5px;
 }
 
 #linkList {
   list-style: none;
   margin: 0;
   padding: 0;
-  max-height: 380px;
+  max-height: 340px;
   overflow-y: auto;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+}
+
+#linkList:empty {
+  border: none;
 }
 
 #linkList li {
   display: flex;
   align-items: center;
-  gap: 6px;
-  padding: 6px 4px;
-  border-bottom: 1px solid #e5e5e5;
+  gap: 8px;
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--border);
+  transition: background 0.1s ease;
 }
 
 #linkList li:last-child {
   border-bottom: none;
 }
 
-.magnet-label {
+#linkList li:hover {
+  background: color-mix(in srgb, var(--accent-soft) 55%, transparent);
+}
+
+#linkList li.hidden {
+  display: none;
+}
+
+.magnet-info {
   flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  cursor: pointer;
+}
+
+.magnet-label {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  font-family: ui-monospace, monospace;
-  font-size: 11px;
+  font-size: 12.5px;
+  font-weight: 500;
+}
+
+.magnet-url {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-family: ui-monospace, "SF Mono", monospace;
+  font-size: 10.5px;
+  color: var(--text-muted);
 }
 
 .copy-one-btn {
   flex-shrink: 0;
-  background: #16a34a;
+  background: var(--success);
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 5px 9px;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.12s ease;
 }
 
 .copy-one-btn:hover {
-  background: #15803d;
+  background: var(--success-hover);
 }
 
 .copy-one-btn.copied {
-  background: #4b5563;
+  background: var(--text-muted);
+}
+
+.empty-state {
+  padding: 24px 12px;
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 12.5px;
 }
