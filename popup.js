@@ -6,9 +6,34 @@ const selectAllCheckbox = document.getElementById("selectAllCheckbox");
 const selectAllLabel = document.getElementById("selectAllLabel");
 const copyAllBtn = document.getElementById("copyAllBtn");
 const copySelectedBtn = document.getElementById("copySelectedBtn");
+const themeToggleBtn = document.getElementById("themeToggleBtn");
 
 let allLinks = []; // [{ url, name }]
 const selected = new Set();
+
+const THEME_KEY = "theme";
+
+function systemTheme() {
+  return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+}
+
+function applyTheme(theme) {
+  document.documentElement.setAttribute("data-theme", theme);
+}
+
+async function initTheme() {
+  const stored = await chrome.storage.local.get(THEME_KEY);
+  applyTheme(stored[THEME_KEY] || systemTheme());
+}
+
+themeToggleBtn.addEventListener("click", async () => {
+  const current = document.documentElement.getAttribute("data-theme");
+  const next = current === "dark" ? "light" : "dark";
+  applyTheme(next);
+  await chrome.storage.local.set({ [THEME_KEY]: next });
+});
+
+initTheme();
 
 function extractMagnetLinks() {
   const anchors = Array.from(document.querySelectorAll('a[href^="magnet:?xt"]'));
@@ -47,16 +72,20 @@ async function copyText(text, btn, activeLabel) {
   }, 1200);
 }
 
-function currentFilter() {
-  return searchInput.value.trim().toLowerCase();
+function currentFilterWords() {
+  return searchInput.value.trim().toLowerCase().split(/\s+/).filter(Boolean);
+}
+
+function matchesFilter(name, url, words) {
+  if (words.length === 0) return true;
+  const haystack = `${name} ${url}`;
+  return words.every((word) => haystack.includes(word));
 }
 
 function visibleLinks() {
-  const filter = currentFilter();
-  if (!filter) return allLinks;
-  return allLinks.filter(
-    (l) => l.name.toLowerCase().includes(filter) || l.url.toLowerCase().includes(filter)
-  );
+  const words = currentFilterWords();
+  if (words.length === 0) return allLinks;
+  return allLinks.filter((l) => matchesFilter(l.name.toLowerCase(), l.url.toLowerCase(), words));
 }
 
 function updateSelectAllState() {
@@ -81,20 +110,20 @@ function updateSelectAllState() {
 }
 
 function applyFilter() {
-  const filter = currentFilter();
+  const words = currentFilterWords();
   const items = listEl.querySelectorAll("li[data-url]");
   let visibleCount = 0;
 
   items.forEach((li) => {
     const name = li.dataset.name;
     const url = li.dataset.url;
-    const match = !filter || name.includes(filter) || url.includes(filter);
+    const match = matchesFilter(name, url, words);
     li.classList.toggle("hidden", !match);
     if (match) visibleCount += 1;
   });
 
   const existingEmpty = listEl.querySelector(".empty-state");
-  if (filter && visibleCount === 0) {
+  if (words.length > 0 && visibleCount === 0) {
     if (!existingEmpty) {
       const li = document.createElement("li");
       li.className = "empty-state-item";
